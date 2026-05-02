@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: MarketSim AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: simulations
+    description: Market simulation operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,113 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /simulations:
+    get:
+      operationId: listSimulations
+      tags: [simulations]
+      summary: List all simulations
+      responses:
+        "200":
+          description: List of simulations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Simulation"
+    post:
+      operationId: createSimulation
+      tags: [simulations]
+      summary: Create a new simulation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSimulationBody"
+      responses:
+        "201":
+          description: Created simulation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Simulation"
+
+  /simulations/stats:
+    get:
+      operationId: getSimulationStats
+      tags: [simulations]
+      summary: Get dashboard statistics
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationStats"
+
+  /simulations/{id}:
+    get:
+      operationId: getSimulation
+      tags: [simulations]
+      summary: Get simulation with full report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Simulation with full report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationWithReport"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    delete:
+      operationId: deleteSimulation
+      tags: [simulations]
+      summary: Delete a simulation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /simulations/{id}/run:
+    post:
+      operationId: runSimulation
+      tags: [simulations]
+      summary: Run the simulation and stream results via SSE
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: SSE stream of simulation progress and results
+          content:
+            text/event-stream: {}
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +143,183 @@ components:
       required:
         - status
 
+    Simulation:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        ideaText:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        acceptanceRate:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - ideaText
+        - status
+        - createdAt
+        - updatedAt
+
+    CreateSimulationBody:
+      type: object
+      properties:
+        ideaText:
+          type: string
+      required:
+        - ideaText
+
+    Persona:
+      type: object
+      properties:
+        id:
+          type: integer
+        simulationId:
+          type: integer
+        name:
+          type: string
+        age:
+          type: integer
+        profession:
+          type: string
+        lifestyle:
+          type: string
+        digitalBehavior:
+          type: string
+        opinion:
+          type: string
+        decision:
+          type: string
+          enum: [confirmed_buy, hesitant_buy, flat_reject]
+        dealBreaker:
+          type: string
+        orderIndex:
+          type: integer
+      required:
+        - id
+        - simulationId
+        - name
+        - age
+        - profession
+        - lifestyle
+        - digitalBehavior
+        - opinion
+        - decision
+        - dealBreaker
+        - orderIndex
+
+    SimulationReport:
+      type: object
+      properties:
+        id:
+          type: integer
+        simulationId:
+          type: integer
+        productCore:
+          type: string
+        targetSegment:
+          type: string
+        competitiveAdvantage:
+          type: string
+        emotionalAcceptance:
+          type: number
+        logicalAcceptance:
+          type: number
+        failurePatterns:
+          type: string
+        successPatterns:
+          type: string
+        recommendation1:
+          type: string
+        recommendation2:
+          type: string
+        recommendation3:
+          type: string
+      required:
+        - id
+        - simulationId
+        - productCore
+        - targetSegment
+        - competitiveAdvantage
+        - emotionalAcceptance
+        - logicalAcceptance
+        - failurePatterns
+        - successPatterns
+        - recommendation1
+        - recommendation2
+        - recommendation3
+
+    SimulationWithReport:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        ideaText:
+          type: string
+        status:
+          type: string
+          enum: [pending, running, completed, failed]
+        acceptanceRate:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        personas:
+          type: array
+          items:
+            $ref: "#/components/schemas/Persona"
+        report:
+          nullable: true
+          $ref: "#/components/schemas/SimulationReport"
+      required:
+        - id
+        - title
+        - ideaText
+        - status
+        - createdAt
+        - updatedAt
+        - personas
+
+    SimulationStats:
+      type: object
+      properties:
+        totalSimulations:
+          type: integer
+        completedSimulations:
+          type: integer
+        avgAcceptanceRate:
+          type: number
+          nullable: true
+        recentSimulations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Simulation"
+      required:
+        - totalSimulations
+        - completedSimulations
+        - recentSimulations
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

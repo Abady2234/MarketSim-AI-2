@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "MarketSim AI"
+version = "1.0.0"
+id = "artifacts/marketsim"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25448
+
+[services.development]
+run = "pnpm --filter @workspace/marketsim run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/marketsim", "run", "build" ]
+publicDir = "artifacts/marketsim/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25448"
+BASE_PATH = "/"
