@@ -179,6 +179,8 @@ router.post("/simulations/:id/run", async (req, res) => {
     return;
   }
 
+  // Allow re-running completed or failed simulations
+
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");

@@ -53,6 +53,7 @@ export default function SimulationDetail() {
   const isPending = currentStatus === "pending";
   const isRunning = currentStatus === "running";
   const isCompleted = currentStatus === "completed";
+  const isFailed = currentStatus === "failed" || streamState.status === "error";
 
   const handleDelete = () => {
     if (confirm("هل أنت متأكد من حذف هذه المحاكاة؟")) {
@@ -114,9 +115,10 @@ export default function SimulationDetail() {
             <span className={`text-xs font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${
               isCompleted ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30" :
               isRunning   ? "bg-cyan-500/15 text-cyan-400 ring-1 ring-cyan-500/30 animate-pulse" :
+              isFailed    ? "bg-red-500/15 text-red-400 ring-1 ring-red-500/30" :
                             "bg-white/[0.06] text-white/40 ring-1 ring-white/10"
             }`}>
-              {isCompleted ? "مكتمل" : isRunning ? "يعمل..." : "في الانتظار"}
+              {isCompleted ? "مكتمل" : isRunning ? "يعمل..." : isFailed ? "فشلت" : "في الانتظار"}
             </span>
             <button
               onClick={handleDelete}
@@ -152,6 +154,35 @@ export default function SimulationDetail() {
           </div>
         )}
       </div>
+
+      {/* ─── Failed State ─── */}
+      {isFailed && !isRunning && (
+        <div className="glass-panel py-14 flex flex-col items-center justify-center text-center mb-6 relative overflow-hidden border border-red-500/20">
+          <div className="absolute inset-0 bg-red-500/[0.04] rounded-2xl" />
+          <div className="relative z-10 flex flex-col items-center gap-5">
+            <div className="w-20 h-20 rounded-2xl bg-red-500/15 border border-red-500/25 flex items-center justify-center">
+              <AlertTriangle className="w-9 h-9 text-red-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-white mb-2">فشلت المحاكاة</h2>
+              <p className="text-white/40 max-w-md text-sm leading-relaxed">
+                {streamState.error || "حدث خطأ أثناء توليد الشخصيات. يمكنك إعادة المحاولة الآن."}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setLocalPersonas([]);
+                setLocalReport(null);
+                startStream();
+              }}
+              className="gradient-button px-10 py-4 rounded-xl font-black text-base uppercase tracking-widest flex items-center gap-3"
+            >
+              <Play className="w-5 h-5" />
+              إعادة المحاولة
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ─── Pending State ─── */}
       {isPending && (

@@ -198,8 +198,8 @@ async function parseIdea(
   ];
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.4",
-    max_completion_tokens: 700,
+    model: "gpt-4o",
+    max_tokens: 700,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     messages: messages as any,
   });
@@ -297,8 +297,8 @@ async function generatePersona(
   ];
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.4",
-    max_completion_tokens: 700,
+    model: "gpt-4o",
+    max_tokens: 700,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     messages: messages as any,
   });
@@ -361,8 +361,8 @@ async function generateReport(
     .join("\n");
 
   const response = await openai.chat.completions.create({
-    model: "gpt-5.4",
-    max_completion_tokens: 1500,
+    model: "gpt-4o",
+    max_tokens: 1500,
     messages: [
       {
         role: "system",
@@ -506,9 +506,13 @@ export async function runSimulationEngine(simulationId: number, res: Response) {
       return;
     }
 
+    // Clean up any previous partial run data
+    await db.delete(personasTable).where(eq(personasTable.simulationId, simulationId));
+    await db.delete(simulationReportsTable).where(eq(simulationReportsTable.simulationId, simulationId));
+
     await db
       .update(simulationsTable)
-      .set({ status: "running", updatedAt: new Date() })
+      .set({ status: "running", acceptanceRate: null, updatedAt: new Date() })
       .where(eq(simulationsTable.id, simulationId));
 
     sendSSE(res, { type: "progress", message: "تحليل الفكرة وفهم السياق..." });
