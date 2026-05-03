@@ -1,81 +1,115 @@
 import { useListSimulations } from "@workspace/api-client-react";
 import { Link } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { History as HistoryIcon, Activity } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock, Activity, ArrowLeft, ChevronLeft } from "lucide-react";
 
 export default function History() {
   const { data: simulations, isLoading } = useListSimulations();
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center gap-3 border-b border-border pb-4 mb-8">
-        <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center text-primary">
-          <HistoryIcon className="w-5 h-5" />
+    <div className="container mx-auto px-4 sm:px-6 py-10 max-w-5xl">
+
+      {/* Header */}
+      <div className="mb-10">
+        <div className="flex items-center gap-2 text-white/30 text-sm mb-4 font-bold uppercase tracking-widest">
+          <ChevronLeft className="w-4 h-4" />
+          <span>لوحة التحكم</span>
+          <span>/</span>
+          <span className="text-white/60">سجل المحاكاة</span>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Simulation History</h1>
-          <p className="text-muted-foreground text-sm uppercase tracking-wider">Archive of previous market analyses</p>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-violet-500/15 flex items-center justify-center border border-violet-500/20">
+            <Clock className="w-6 h-6 text-violet-400" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-black text-white">سجل المحاكاة</h1>
+            <p className="text-white/35 text-sm uppercase tracking-widest font-bold mt-1">أرشيف تحليلات السوق السابقة</p>
+          </div>
         </div>
       </div>
 
+      {/* List */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full bg-card rounded-md" />
+            <Skeleton key={i} className="h-24 w-full rounded-2xl bg-white/[0.04]" />
           ))}
         </div>
       ) : !simulations || simulations.length === 0 ? (
-        <Card className="bg-card border-dashed border-border py-16">
-          <CardContent className="flex flex-col items-center justify-center text-center space-y-4">
-            <Activity className="w-16 h-16 text-muted-foreground" />
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold text-foreground uppercase tracking-widest">No History Found</h2>
-              <p className="text-muted-foreground text-sm">You haven't run any simulations yet.</p>
+        <div className="glass-panel py-20 flex flex-col items-center justify-center text-center">
+          <div className="w-20 h-20 mb-6 relative">
+            <div className="absolute inset-0 bg-violet-500/15 blur-2xl rounded-full" />
+            <div className="relative z-10 w-full h-full flex items-center justify-center">
+              <Activity className="w-10 h-10 text-white/15" />
             </div>
-            <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary/10 uppercase font-bold text-xs tracking-wider mt-4">
-              <Link href="/simulate">Initialize First Scan</Link>
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+          <h3 className="text-xl font-black text-white mb-2">لا توجد محاكاة في السجل</h3>
+          <p className="text-white/35 text-sm max-w-sm mb-8 leading-relaxed">لم تُنشئ أي محاكاة بعد. ابدأ أولى تجاربك الآن.</p>
+          <Link href="/simulate" className="gradient-button px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest">
+            ابدأ محاكاة جديدة
+          </Link>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {simulations.map((sim) => (
             <Link key={sim.id} href={`/simulation/${sim.id}`}>
-              <Card className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardContent className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors line-clamp-1" dir="auto">
-                      {sim.title || "Untitled Analysis"}
-                    </h3>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider mt-2">
-                      ID: {sim.id} • {new Date(sim.createdAt).toLocaleString()}
-                    </p>
+              <div className="glass-card px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.07] hover:border-violet-500/20 transition-all cursor-pointer group">
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-black text-base text-white group-hover:text-cyan-300 transition-colors truncate" dir="auto">
+                    {sim.title || "تحليل بدون عنوان"}
+                  </h3>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    <span className="text-xs text-white/25 font-mono">#{sim.id}</span>
+                    <span className="w-1 h-1 rounded-full bg-white/20" />
+                    <span className="text-xs text-white/25">
+                      {new Date(sim.createdAt).toLocaleDateString("ar-SA", {
+                        year: "numeric", month: "long", day: "numeric"
+                      })}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-6 shrink-0">
-                    <div className="flex flex-col items-end">
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Status</span>
-                      <Badge variant="outline" className={`uppercase text-xs font-bold tracking-wider ${sim.status === 'completed' ? 'border-success text-success' : sim.status === 'running' ? 'border-primary text-primary animate-pulse' : sim.status === 'failed' ? 'border-destructive text-destructive' : 'border-muted-foreground text-muted-foreground'}`}>
-                        {sim.status}
-                      </Badge>
-                    </div>
-                    <div className="flex flex-col items-end min-w-[100px]">
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Acceptance</span>
-                      {sim.acceptanceRate !== null && sim.acceptanceRate !== undefined ? (
-                        <div className="text-xl font-bold text-accent">{Math.round(sim.acceptanceRate)}%</div>
-                      ) : (
-                        <div className="text-xl font-bold text-muted-foreground">--</div>
-                      )}
-                    </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center gap-6 shrink-0">
+                  <div className="text-right">
+                    <p className="text-[10px] text-white/25 uppercase tracking-widest font-bold mb-1">الحالة</p>
+                    <span className={`text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                      sim.status === "completed" ? "bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30" :
+                      sim.status === "running"   ? "bg-cyan-500/15 text-cyan-400 ring-1 ring-cyan-500/30 animate-pulse" :
+                      sim.status === "failed"    ? "bg-red-500/15 text-red-400 ring-1 ring-red-500/30" :
+                                                   "bg-white/[0.06] text-white/30 ring-1 ring-white/10"
+                    }`}>
+                      {sim.status === "completed" ? "مكتمل" :
+                       sim.status === "running"   ? "يعمل" :
+                       sim.status === "failed"    ? "فشل" : "انتظار"}
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+
+                  <div className="text-right min-w-[64px]">
+                    <p className="text-[10px] text-white/25 uppercase tracking-widest font-bold mb-1">القبول</p>
+                    {sim.acceptanceRate !== null && sim.acceptanceRate !== undefined ? (
+                      <div>
+                        <span className="text-2xl font-black text-white">{Math.round(sim.acceptanceRate)}</span>
+                        <span className="text-sm text-white/40">%</span>
+                      </div>
+                    ) : (
+                      <span className="text-2xl font-black text-white/20">--</span>
+                    )}
+                  </div>
+
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowLeft className="w-5 h-5 text-cyan-400" />
+                  </div>
+                </div>
+
+              </div>
             </Link>
           ))}
         </div>
       )}
+
     </div>
   );
 }
