@@ -11,6 +11,12 @@ export const simulationsTable = pgTable("simulations", {
   image1Url: text("image1_url"),
   image2Url: text("image2_url"),
   numPersonas: integer("num_personas").notNull().default(7),
+  // New optional detail fields
+  targetAge: text("target_age"),
+  targetCity: text("target_city"),
+  problemSolved: text("problem_solved"),
+  competitors: text("competitors"),
+  extraDetails: text("extra_details"),
   status: text("status").notNull().default("pending"),
   acceptanceRate: real("acceptance_rate"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

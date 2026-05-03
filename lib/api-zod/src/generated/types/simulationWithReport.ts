@@ -18,6 +18,11 @@ export interface SimulationWithReport {
   image1Url?: string | null;
   image2Url?: string | null;
   numPersonas: number;
+  targetAge?: string | null;
+  targetCity?: string | null;
+  problemSolved?: string | null;
+  competitors?: string | null;
+  extraDetails?: string | null;
   status: SimulationWithReportStatus;
   acceptanceRate?: number | null;
   createdAt: Date;

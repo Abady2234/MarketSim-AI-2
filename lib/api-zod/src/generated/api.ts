@@ -26,6 +26,11 @@ export const ListSimulationsResponseItem = zod.object({
   image1Url: zod.string().nullish(),
   image2Url: zod.string().nullish(),
   numPersonas: zod.number(),
+  targetAge: zod.string().nullish(),
+  targetCity: zod.string().nullish(),
+  problemSolved: zod.string().nullish(),
+  competitors: zod.string().nullish(),
+  extraDetails: zod.string().nullish(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),
@@ -37,7 +42,7 @@ export const ListSimulationsResponse = zod.array(ListSimulationsResponseItem);
  * @summary Create a new simulation
  */
 export const createSimulationBodyNumPersonasMin = 3;
-export const createSimulationBodyNumPersonasMax = 12;
+export const createSimulationBodyNumPersonasMax = 40;
 
 export const CreateSimulationBody = zod.object({
   ideaText: zod.string(),
@@ -50,6 +55,11 @@ export const CreateSimulationBody = zod.object({
     .min(createSimulationBodyNumPersonasMin)
     .max(createSimulationBodyNumPersonasMax)
     .optional(),
+  targetAge: zod.string().optional(),
+  targetCity: zod.string().optional(),
+  problemSolved: zod.string().optional(),
+  competitors: zod.string().optional(),
+  extraDetails: zod.string().optional(),
 });
 
 /**
@@ -69,6 +79,11 @@ export const GetSimulationStatsResponse = zod.object({
       image1Url: zod.string().nullish(),
       image2Url: zod.string().nullish(),
       numPersonas: zod.number(),
+      targetAge: zod.string().nullish(),
+      targetCity: zod.string().nullish(),
+      problemSolved: zod.string().nullish(),
+      competitors: zod.string().nullish(),
+      extraDetails: zod.string().nullish(),
       status: zod.enum(["pending", "running", "completed", "failed"]),
       acceptanceRate: zod.number().nullish(),
       createdAt: zod.coerce.date(),
@@ -93,6 +108,11 @@ export const GetSimulationResponse = zod.object({
   image1Url: zod.string().nullish(),
   image2Url: zod.string().nullish(),
   numPersonas: zod.number(),
+  targetAge: zod.string().nullish(),
+  targetCity: zod.string().nullish(),
+  problemSolved: zod.string().nullish(),
+  competitors: zod.string().nullish(),
+  extraDetails: zod.string().nullish(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),

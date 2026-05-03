@@ -117,6 +117,11 @@ router.post("/simulations", async (req, res) => {
         image1Url: body.data.image1Url ?? null,
         image2Url: body.data.image2Url ?? null,
         numPersonas: body.data.numPersonas ?? 7,
+        targetAge: body.data.targetAge ?? null,
+        targetCity: body.data.targetCity ?? null,
+        problemSolved: body.data.problemSolved ?? null,
+        competitors: body.data.competitors ?? null,
+        extraDetails: body.data.extraDetails ?? null,
         status: "pending",
       })
       .returning();

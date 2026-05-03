@@ -165,6 +165,21 @@ components:
           nullable: true
         numPersonas:
           type: integer
+        targetAge:
+          type: string
+          nullable: true
+        targetCity:
+          type: string
+          nullable: true
+        problemSolved:
+          type: string
+          nullable: true
+        competitors:
+          type: string
+          nullable: true
+        extraDetails:
+          type: string
+          nullable: true
         status:
           type: string
           enum: [pending, running, completed, failed]
@@ -202,7 +217,17 @@ components:
         numPersonas:
           type: integer
           minimum: 3
-          maximum: 12
+          maximum: 40
+        targetAge:
+          type: string
+        targetCity:
+          type: string
+        problemSolved:
+          type: string
+        competitors:
+          type: string
+        extraDetails:
+          type: string
       required:
         - ideaText
 
@@ -312,6 +337,21 @@ components:
           nullable: true
         numPersonas:
           type: integer
+        targetAge:
+          type: string
+          nullable: true
+        targetCity:
+          type: string
+          nullable: true
+        problemSolved:
+          type: string
+          nullable: true
+        competitors:
+          type: string
+          nullable: true
+        extraDetails:
+          type: string
+          nullable: true
         status:
           type: string
           enum: [pending, running, completed, failed]

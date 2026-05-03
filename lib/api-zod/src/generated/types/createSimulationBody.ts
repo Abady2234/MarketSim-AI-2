@@ -14,7 +14,12 @@ export interface CreateSimulationBody {
   image2Url?: string;
   /**
    * @minimum 3
-   * @maximum 12
+   * @maximum 40
    */
   numPersonas?: number;
+  targetAge?: string;
+  targetCity?: string;
+  problemSolved?: string;
+  competitors?: string;
+  extraDetails?: string;
 }

@@ -16,6 +16,11 @@ export interface Simulation {
   image1Url?: string | null;
   image2Url?: string | null;
   numPersonas: number;
+  targetAge?: string | null;
+  targetCity?: string | null;
+  problemSolved?: string | null;
+  competitors?: string | null;
+  extraDetails?: string | null;
   status: SimulationStatus;
   acceptanceRate?: number | null;
   createdAt: Date;
