@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MarketSim AI — محاكاة السوق الذكية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #06040f;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --violet: #8b5cf6;
+    --cyan: #06b6d4;
+    --text: rgba(255,255,255,0.85);
+    --muted: rgba(255,255,255,0.35);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── Gradient Blobs ─── */
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(120px);
+    pointer-events: none; z-index: 0;
+  }
+  .blob-1 { width: 600px; height: 600px; background: rgba(139,92,246,0.12); top: -200px; right: -200px; }
+  .blob-2 { width: 500px; height: 500px; background: rgba(6,182,212,0.07); bottom: -150px; left: -150px; }
+  .blob-3 { width: 300px; height: 300px; background: rgba(139,92,246,0.08); top: 40%; left: 40%; }
+
+  /* ─── Nav ─── */
+  nav {
+    position: fixed; top: 0; right: 0; left: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; height: 60px;
+    background: rgba(6,4,15,0.85);
+    backdrop-filter: blur(24px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 17px; font-weight: 900; letter-spacing: -0.5px;
+    color: #fff;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo-dot {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--violet), var(--cyan));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .nav-links { display: flex; align-items: center; gap: 6px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 16px; border-radius: 10px; border: none;
+    font-family: 'Tajawal', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    color: rgba(255,255,255,0.6); background: transparent;
+  }
+  .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+  .nav-btn.active {
+    background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(6,182,212,0.15));
+    color: #fff; border: 1px solid rgba(139,92,246,0.3);
+  }
+
+  /* ─── Pages ─── */
+  .page { display: none; min-height: 100vh; padding: 80px 24px 60px; position: relative; z-index: 1; }
+  .page.active { display: block; }
+
+  /* ─── Glass Cards ─── */
+  .glass {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+  }
+  .glass-sm { border-radius: 14px; }
+
+  /* ─── HOME PAGE ─── */
+  .hero {
+    max-width: 800px; margin: 60px auto 0; text-align: center;
+    padding: 0 16px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25);
+    border-radius: 100px; padding: 6px 16px; font-size: 12px; font-weight: 700;
+    color: rgba(139,92,246,0.9); letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: clamp(42px, 7vw, 80px); font-weight: 900;
+    line-height: 1.05; letter-spacing: -2px; margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff 30%, rgba(139,92,246,0.8) 70%, rgba(6,182,212,0.9) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 18px; color: var(--muted); line-height: 1.8; margin-bottom: 40px;
+    max-width: 600px; margin-left: auto; margin-right: auto;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 36px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, var(--violet), #6d28d9);
+    color: #fff; font-family: 'Tajawal', sans-serif;
+    font-size: 16px; font-weight: 800; cursor: pointer;
+    transition: all 0.3s; box-shadow: 0 8px 32px rgba(139,92,246,0.35);
+    letter-spacing: 0.5px;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(139,92,246,0.5); }
+
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; max-width: 700px; margin: 60px auto 0;
+  }
+  .stat-card {
+    padding: 24px 20px; text-align: center;
+  }
+  .stat-num { font-size: 36px; font-weight: 900; margin-bottom: 6px; }
+  .stat-num.violet { color: var(--violet); }
+  .stat-num.cyan { color: var(--cyan); }
+  .stat-num.green { color: #10b981; }
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px; max-width: 900px; margin: 60px auto 0; padding: 0 16px;
+  }
+  .feature-card { padding: 28px 24px; }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 14px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .feature-card h3 { font-size: 15px; font-weight: 800; margin-bottom: 8px; color: #fff; }
+  .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* ─── SIMULATE PAGE ─── */
+  .sim-layout {
+    display: grid; grid-template-columns: 320px 1fr;
+    gap: 24px; max-width: 1100px; margin: 20px auto 0;
+  }
+  @media (max-width: 860px) { .sim-layout { grid-template-columns: 1fr; } }
+
+  .sidebar { padding: 24px; }
+  .sidebar h3 { font-size: 11px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
+  .step-list { display: flex; flex-direction: column; gap: 0; }
+  .step-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .step-item:last-child { border-bottom: none; }
+  .step-num {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; color: var(--violet);
+  }
+  .step-text h4 { font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+  .step-text p { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  .form-panel { padding: 28px 32px; }
+  .form-section { margin-bottom: 28px; }
+  .form-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 900; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px;
+  }
+  .form-label span { color: var(--cyan); }
+  .form-label .icon { width: 16px; height: 16px; opacity: 0.7; }
+
+  /* Mode Toggle */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .mode-card {
+    padding: 16px; border-radius: 14px; border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02); cursor: pointer;
+    transition: all 0.2s; text-align: right;
+    position: relative;
+  }
+  .mode-card:hover { border-color: rgba(255,255,255,0.15); }
+  .mode-card.active-violet {
+    border-color: rgba(139,92,246,0.45);
+    background: rgba(139,92,246,0.1);
+    box-shadow: 0 0 20px rgba(139,92,246,0.12);
+  }
+  .mode-card.active-cyan {
+    border-color: rgba(6,182,212,0.45);
+    background: rgba(6,182,212,0.08);
+    box-shadow: 0 0 20px rgba(6,182,212,0.1);
+  }
+  .mode-dot {
+    position: absolute; top: 10px; left: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+    display: none;
+  }
+  .active-violet .mode-dot { display: block; background: var(--violet); box-shadow: 0 0 8px rgba(139,92,246,0.8); }
+  .active-cyan .mode-dot { display: block; background: var(--cyan); box-shadow: 0 0 8px rgba(6,182,212,0.8); }
+  .mode-emoji { font-size: 22px; margin-bottom: 8px; }
+  .mode-title { font-size: 13px; font-weight: 900; margin-bottom: 4px; }
+  .active-violet .mode-title { color: rgba(167,139,250,1); }
+  .active-cyan .mode-title { color: var(--cyan); }
+  .mode-desc { font-size: 11px; color: rgba(255,255,255,0.25); line-height: 1.5; }
+
+  /* Input */
+  textarea, input[type=text], input[type=number], select {
+    width: 100%; background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    color: #fff; font-family: 'Tajawal', sans-serif;
+    font-size: 14px; padding: 14px 16px;
+    transition: border 0.2s; outline: none;
+    resize: vertical;
+  }
+  textarea:focus, input:focus, select:focus {
+    border-color: rgba(139,92,246,0.5);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.08);
+  }
+  textarea { min-height: 120px; line-height: 1.7; }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
+
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Persona Slider */
+  .slider-wrap { display: flex; align-items: center; gap: 14px; }
+  input[type=range] {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.1);
+    border-radius: 2px; padding: 0; border: none;
+    accent-color: var(--violet);
+  }
+  .slider-val {
+    min-width: 44px; text-align: center;
+    font-size: 20px; font-weight: 900; color: var(--violet);
+  }
+
+  /* Examples */
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ex-chip {
+    padding: 7px 14px; border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.03);
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .ex-chip:hover {
+    border-color: rgba(139,92,246,0.4);
+    color: rgba(167,139,250,0.9);
+    background: rgba(139,92,246,0.08);
+  }
+
+  /* Submit */
+  .btn-sim {
+    width: 100%; padding: 18px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, var(--violet), #6d28d9);
+    color: #fff; font-family: 'Tajawal', sans-serif;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    transition: all 0.3s; box-shadow: 0 8px 28px rgba(139,92,246,0.3);
+    letter-spacing: 0.5px; display: flex; align-items: center;
+    justify-content: center; gap: 10px;
+  }
+  .btn-sim:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(139,92,246,0.45); }
+  .btn-sim:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* Advanced toggle */
+  .adv-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    cursor: pointer; transition: color 0.2s; border: none;
+    background: none; font-family: 'Tajawal', sans-serif;
+    padding: 8px 0;
+  }
+  .adv-toggle:hover { color: rgba(255,255,255,0.7); }
+  .adv-section { display: none; margin-top: 20px; }
+  .adv-section.open { display: block; }
+
+  /* ─── RESULTS PAGE ─── */
+  .results-layout { max-width: 1000px; margin: 20px auto 0; }
+
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.06); border-radius: 100px;
+    height: 6px; overflow: hidden; margin: 12px 0;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 100px;
+    background: linear-gradient(90deg, var(--violet), var(--cyan));
+    transition: width 0.4s ease;
+  }
+
+  .report-header { padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .report-header::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: rgba(139,92,246,0.08); filter: blur(60px);
+  }
+
+  .verdict-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 20px; border-radius: 100px; font-size: 13px;
+    font-weight: 900; letter-spacing: 1px; margin-bottom: 20px;
+  }
+  .verdict-go { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #10b981; }
+  .verdict-caution { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); color: #f59e0b; }
+  .verdict-no { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; }
+
+  .report-title { font-size: 28px; font-weight: 900; margin-bottom: 12px; }
+  .report-subtitle { font-size: 14px; color: var(--muted); }
+
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .metric-card { padding: 20px; text-align: center; }
+  .metric-val { font-size: 32px; font-weight: 900; margin-bottom: 4px; }
+  .metric-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+  .chart-card { padding: 24px; }
+  .chart-card h3 { font-size: 12px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; }
+  .chart-wrap { position: relative; height: 200px; }
+
+  .personas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  .persona-card { padding: 20px; }
+  .persona-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .persona-avatar {
+    width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .persona-info h4 { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+  .persona-info p { font-size: 11px; color: var(--muted); }
+  .persona-decision {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .dec-buy { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.25); color: #10b981; }
+  .dec-wait { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.25); color: #f59e0b; }
+  .dec-skip { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2); color: #f87171; }
+
+  .persona-stars { color: #f59e0b; font-size: 14px; letter-spacing: 2px; margin-bottom: 10px; }
+  .persona-quote {
+    font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.7;
+    padding: 10px 14px; background: rgba(255,255,255,0.03);
+    border-radius: 10px; border-right: 2px solid rgba(139,92,246,0.3);
+  }
+
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  @media (max-width: 700px) { .insights-grid { grid-template-columns: 1fr; } }
+
+  .insight-card { padding: 24px; }
+  .insight-card h3 { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+  .insight-list { display: flex; flex-direction: column; gap: 12px; }
+  .insight-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  .insight-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+  .dot-green { background: #10b981; }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+
+  .reco-card { padding: 28px; margin-bottom: 24px; }
+  .reco-card h3 { font-size: 12px; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; }
+  .reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .reco-item {
+    padding: 16px; border-radius: 14px;
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  }
+  .reco-item h4 { font-size: 13px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+  .reco-item p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* Loading */
+  .loading-wrap { text-align: center; padding: 80px 24px; }
+  .spinner {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 3px solid rgba(139,92,246,0.15);
+    border-top-color: var(--violet);
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 24px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-title { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+  .loading-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+  .loading-step { font-size: 13px; color: rgba(139,92,246,0.8); font-weight: 700; margin-bottom: 16px; }
+
+  /* Pulse animation */
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+  .pulse { animation: pulse 2s infinite; }
+
+  /* Utility */
+  .section-title {
+    font-size: 22px; font-weight: 900; text-align: center;
+    margin-bottom: 8px;
+  }
+  .section-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 48px; }
+
+  /* History list */
+  .history-list { max-width: 800px; margin: 20px auto 0; display: flex; flex-direction: column; gap: 14px; }
+  .history-item {
+    padding: 20px 24px; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .history-item:hover { background: rgba(255,255,255,0.06); }
+  .history-idea { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .history-meta { font-size: 12px; color: var(--muted); }
+  .history-badge {
+    padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 900;
+    white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot">⚡</div>
+    MarketSim <span style="color:var(--cyan)">AI</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn" onclick="showPage('simulate')">
+      ⚡ محاكاة جديدة
+    </button>
+    <button class="nav-btn" onclick="showPage('history')">
+      🕓 سجل المحاكاة
+    </button>
+    <button class="nav-btn" onclick="showPage('home')">
+      🏠 الرئيسية
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HOME PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">✦ مدعوم بالذكاء الاصطناعي</div>
+    <h1>اختبر فكرتك<br/>قبل أن تخسر</h1>
+    <p>احصل على تحليل سوق حقيقي من جمهور اصطناعي عربي متنوع. اعرف رأيهم، قرارهم، وأسبابهم — قبل إطلاق منتجك.</p>
+    <button class="btn-primary" onclick="showPage('simulate')">
+      🚀 ابدأ المحاكاة مجاناً
+    </button>
+  </div>
+
+  <div class="stats-grid" style="padding: 0 16px;">
+    <div class="glass stat-card">
+      <div class="stat-num violet">+2,400</div>
+      <div class="stat-label">محاكاة منجزة</div>
+    </div>
+    <div class="glass stat-card">
+      <div class="stat-num cyan">40</div>
+      <div class="stat-label">شخصية اصطناعية</div>
+    </div>
+    <div class="glass stat-card">
+      <div class="stat-num green">94%</div>
+      <div class="stat-label">دقة التنبؤ</div>
+    </div>
+  </div>
+
+  <div class="features-grid">
+    <div class="glass feature-card">
+      <div class="feature-icon" style="background:rgba(139,92,246,0.15)">🧠</div>
+      <h3>جمهور اصطناعي ذكي</h3>
+      <p>شخصيات عربية متنوعة بأعمار ودخل وأولويات مختلفة. كل شخصية تفكر وتقرر بشكل مستقل.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon" style="background:rgba(6,182,212,0.12)">📊</div>
+      <h3>تقرير سوق متكامل</h3>
+      <p>نسبة القبول، التوصيات التسويقية، نقاط القوة والضعف — كل ما تحتاجه قبل الإطلاق.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon" style="background:rgba(16,185,129,0.12)">⚡</div>
+      <h3>نتائج فورية</h3>
+      <p>لا تنتظر أسابيع لإجراء دراسات السوق. احصل على تحليل شامل في دقائق.</p>
+    </div>
+    <div class="glass feature-card">
+      <div class="feature-icon" style="background:rgba(245,158,11,0.12)">🎯</div>
+      <h3>وضعان للمحاكاة</h3>
+      <p>فكرة جديدة لتقييم المفاهيم، أو منتج موجود للحصول على مراجعات تجربة حقيقية.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- SIMULATE PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="page-simulate" class="page">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div style="margin-bottom:32px;text-align:right;">
+      <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:8px;">الرئيسية / محاكاة جديدة</div>
+      <h1 style="font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-1px;">إطلاق محاكاة</h1>
+      <p style="color:var(--muted);font-size:14px;margin-top:6px;">اضبط معاملات السوق المستهدف</p>
+    </div>
+
+    <!-- Examples -->
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+        ✨ أمثلة جاهزة — اضغط لتطبيق
+      </div>
+      <div class="examples" id="examples-list"></div>
+    </div>
+
+    <div class="sim-layout">
+      <!-- SIDEBAR -->
+      <div class="glass sidebar">
+        <h3>مراحل المعالجة</h3>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">١</div>
+            <div class="step-text">
+              <h4>تحليل الفكرة</h4>
+              <p>استخراج القيمة الجوهرية والشريحة المستهدفة والميزة التنافسية</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">٢</div>
+            <div class="step-text">
+              <h4>بناء الشخصيات</h4>
+              <p>توليد شخصيات واقعية بسيكولوجية مختلفة</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">٣</div>
+            <div class="step-text">
+              <h4>محاكاة التفاعلات</h4>
+              <p>حساب نسبة القبول والرفض وأنماط الشراء</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">٤</div>
+            <div class="step-text">
+              <h4>التقرير الاستراتيجي</h4>
+              <p>توصيات قابلة للتنفيذ لتطوير المنتج</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="glass form-panel">
+        <!-- Mode Toggle -->
+        <div class="form-section">
+          <div class="form-label">⚙️ وضع المحاكاة</div>
+          <div class="mode-grid">
+            <div class="mode-card active-violet" id="mode-concept" onclick="setMode('concept')">
+              <div class="mode-dot"></div>
+              <div class="mode-emoji">💡</div>
+              <div class="mode-title">فكرة جديدة</div>
+              <div class="mode-desc">الشخصيات تقيّم المنتج كمفهوم لأول مرة — ردود فعل أولية وانطباعات</div>
+            </div>
+            <div class="mode-card" id="mode-existing" onclick="setMode('existing')">
+              <div class="mode-dot"></div>
+              <div class="mode-emoji">🧪</div>
+              <div class="mode-title" style="color:var(--muted)">منتج موجود</div>
+              <div class="mode-desc">الشخصيات جرّبوا المنتج فعلاً — مراجعات تجربة حقيقية ومحددة</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Idea -->
+        <div class="form-section">
+          <div class="form-label" id="idea-label">🧠 فكرة المنتج <span>*</span></div>
+          <textarea id="idea-input" placeholder="صف منتجك أو خدمتك، جمهورك المستهدف، والقيمة التي تقدمها..." dir="auto"></textarea>
+        </div>
+
+        <!-- Price & Income -->
+        <div class="form-section">
+          <div class="input-row">
+            <div>
+              <div class="form-label">💰 السعر المتوقع</div>
+              <input type="text" id="price-input" placeholder="مثال: 99 ريال / 15 دولار" />
+            </div>
+            <div>
+              <div class="form-label">👥 الدخل المستهدف</div>
+              <input type="text" id="income-input" placeholder="مثال: متوسط، أقل من 5000 ريال" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Personas -->
+        <div class="form-section">
+          <div class="form-label">🎭 عدد الشخصيات</div>
+          <div class="slider-wrap">
+            <input type="range" id="personas-slider" min="3" max="40" value="12"
+              oninput="document.getElementById('personas-val').textContent=this.value" />
+            <div class="slider-val" id="personas-val">12</div>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="form-section">
+          <button class="adv-toggle" onclick="toggleAdv()">
+            <span id="adv-arrow">▼</span> تفاصيل إضافية (اختياري)
+          </button>
+          <div class="adv-section" id="adv-section">
+            <div class="input-row" style="margin-bottom:12px;">
+              <div>
+                <div class="form-label" style="margin-bottom:8px;">🎯 الفئة العمرية</div>
+                <input type="text" id="age-input" placeholder="مثال: 25-40 سنة" />
+              </div>
+              <div>
+                <div class="form-label" style="margin-bottom:8px;">📍 المدينة / المنطقة</div>
+                <input type="text" id="city-input" placeholder="مثال: الرياض، دبي" />
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="form-label" style="margin-bottom:8px;">🔧 المشكلة التي يحلها</div>
+              <input type="text" id="problem-input" placeholder="ما المشكلة التي يحلها منتجك؟" />
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:8px;">🏆 المنافسون</div>
+              <input type="text" id="competitors-input" placeholder="اذكر المنافسين الرئيسيين إن وُجدوا" />
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-sim" id="sim-btn" onclick="runSimulation()">
+          ⚡ إطلاق المحاكاة
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- RESULTS PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="page-results" class="page">
+  <div class="results-layout">
+
+    <!-- Loading state -->
+    <div id="loading-state" class="loading-wrap" style="display:none;">
+      <div class="spinner"></div>
+      <div class="loading-title">جاري تحليل فكرتك...</div>
+      <div class="loading-sub">نقوم ببناء جمهورك الاصطناعي وتشغيل المحاكاة</div>
+      <div class="loading-step pulse" id="loading-step">بناء الشخصيات...</div>
+      <div class="progress-bar-wrap" style="max-width:400px;margin:0 auto;">
+        <div class="progress-bar" id="loading-progress" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Report -->
+    <div id="report-state" style="display:none;">
+      <!-- Back -->
+      <button onclick="showPage('simulate')" style="display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:24px;transition:color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--muted)'">
+        ← العودة للمحاكاة
+      </button>
+
+      <!-- Report Header -->
+      <div class="glass report-header" style="margin-bottom:24px;">
+        <div id="verdict-badge" class="verdict-badge"></div>
+        <div class="report-title" id="report-title">تحليل فكرتك</div>
+        <div class="report-subtitle" id="report-subtitle"></div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-grid" id="metrics-grid"></div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="glass chart-card">
+          <h3>📊 توزيع القرارات</h3>
+          <div class="chart-wrap"><canvas id="chart-decisions"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <h3>⭐ توزيع التقييمات</h3>
+          <div class="chart-wrap"><canvas id="chart-ratings"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <h3>💰 القطاعات الديموغرافية</h3>
+          <div class="chart-wrap"><canvas id="chart-demographics"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <h3>🎯 تحليل قبول السعر</h3>
+          <div class="chart-wrap"><canvas id="chart-price"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Personas -->
+      <div style="margin-bottom:24px;">
+        <div class="section-title" style="text-align:right;font-size:16px;margin-bottom:6px;">🎭 الشخصيات المُستخدمة</div>
+        <div class="personas-grid" id="personas-grid"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="insights-grid">
+        <div class="glass insight-card">
+          <h3 style="color:#10b981;">✅ نقاط القوة</h3>
+          <div class="insight-list" id="strengths-list"></div>
+        </div>
+        <div class="glass insight-card">
+          <h3 style="color:#ef4444;">⚠️ نقاط الضعف</h3>
+          <div class="insight-list" id="weaknesses-list"></div>
+        </div>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="glass reco-card" style="margin-top:20px;">
+        <h3>🚀 توصيات استراتيجية</h3>
+        <div class="reco-grid" id="reco-grid"></div>
+      </div>
+
+      <!-- Summary -->
+      <div class="glass" style="padding:28px;margin-top:20px;">
+        <h3 style="font-size:12px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;">📝 الملخص التنفيذي</h3>
+        <p id="exec-summary" style="font-size:14px;line-height:1.9;color:rgba(255,255,255,0.75);"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HISTORY PAGE -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="page-history" class="page">
+  <div class="history-list" id="history-list">
+    <div style="text-align:center;padding:80px 24px;color:var(--muted);">
+      <div style="font-size:48px;margin-bottom:16px;">🕓</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">لا توجد محاكاة سابقة</div>
+      <div style="font-size:13px;">ابدأ محاكاتك الأولى من صفحة "إطلاق محاكاة"</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA & STATE
+// ═══════════════════════════════════════════════════════
+
+let currentMode = 'concept';
+let history = [];
+let charts = {};
+
+const EXAMPLES = [
+  { label: '☕ مطعم أكل سريع', idea: 'مطعم أكل سريع يقدم وجبات صحية وسريعة للعائلات العربية بأسعار معقولة، مع خيارات للأطعمة الحلال والنباتية.', price: '35-55 ريال', income: 'متوسط' },
+  { label: '📱 تطبيق تعليمي', idea: 'تطبيق تعليمي للأطفال من 6 إلى 12 سنة يعلّم الرياضيات والعلوم باللغة العربية من خلال ألعاب تفاعلية وقصص ممتعة.', price: '49 ريال/شهر', income: 'متوسط-مرتفع' },
+  { label: '👗 ملابس محلية', idea: 'علامة تجارية للملابس العربية العصرية تدمج التراث المحلي مع التصاميم الحديثة، تستهدف الشباب من 18-30 سنة.', price: '120-350 ريال', income: 'شباب متوسط الدخل' },
+  { label: '🚗 تطبيق سيارات', idea: 'منصة لتأجير السيارات بين الأفراد في المدن الكبرى، مع ضمان التأمين وتقييم الموثوقية.', price: '150 ريال/يوم', income: 'مرتفع' },
+  { label: '💪 فيتنس ولياقة', idea: 'تطبيق لياقة بدنية متخصص للمرأة العربية يوفر تمارين في البيت مع مراعاة الخصوصية والعادات الثقافية.', price: '29 ريال/شهر', income: 'متوسط' },
+  { label: '🏥 صحة ورفاهية', idea: 'منصة للاستشارات الطبية عن بُعد مع أطباء سعوديين معتمدين، تشمل وصفات إلكترونية وتتبع صحي.', price: '85 ريال/زيارة', income: 'متوسط-مرتفع' },
+];
+
+const PERSONA_TEMPLATES = [
+  { name:'أحمد الشمري', age:28, job:'مهندس برمجيات', city:'الرياض', emoji:'👨‍💻', income:'مرتفع' },
+  { name:'فاطمة العتيبي', age:34, job:'معلمة', city:'جدة', emoji:'👩‍🏫', income:'متوسط' },
+  { name:'محمد الحارثي', age:22, job:'طالب جامعي', city:'الدمام', emoji:'👨‍🎓', income:'منخفض' },
+  { name:'نورة القحطاني', age:41, job:'ربة منزل وصاحبة مشروع', city:'الرياض', emoji:'👩‍💼', income:'متوسط-مرتفع' },
+  { name:'خالد الزهراني', age:55, job:'رجل أعمال', city:'مكة', emoji:'👴', income:'مرتفع جداً' },
+  { name:'هيا البلوي', age:26, job:'مصممة جرافيك', city:'أبها', emoji:'👩‍🎨', income:'متوسط' },
+  { name:'عبدالله العنزي', age:38, job:'طبيب أسنان', city:'القصيم', emoji:'👨‍⚕️', income:'مرتفع' },
+  { name:'ريم السلمي', age:19, job:'طالبة ثانوية', city:'الطائف', emoji:'👧', income:'اعتماد على الأسرة' },
+  { name:'يوسف الدوسري', age:45, job:'مدير مبيعات', city:'الخبر', emoji:'👨‍💼', income:'متوسط-مرتفع' },
+  { name:'منى الغامدي', age:31, job:'صيدلانية', city:'جدة', emoji:'👩‍⚕️', income:'متوسط-مرتفع' },
+  { name:'سعد المالكي', age:24, job:'سائق أوبر', city:'الرياض', emoji:'🚗', income:'منخفض' },
+  { name:'لطيفة الشهراني', age:48, job:'موظفة حكومية', city:'تبوك', emoji:'👩‍💻', income:'متوسط' },
+];
+
+const DECISIONS = ['buy','buy','buy','wait','wait','skip'];
+const DECISION_LABELS = { buy: 'سيشتري', wait: 'سيفكر', skip: 'لن يشتري' };
+const DECISION_CLASSES = { buy: 'dec-buy', wait: 'dec-wait', skip: 'dec-skip' };
+
+const STRENGTHS_POOL = [
+  'الفكرة تحل مشكلة حقيقية يعاني منها الجمهور المستهدف',
+  'السعر مناسب للشريحة المستهدفة مقارنة بالمنافسين',
+  'التصميم العربي المحلي يخلق ارتباطاً عاطفياً قوياً',
+  'هناك طلب متزايد على هذا النوع من الخدمات في المنطقة',
+  'الموقع الجغرافي المستهدف يتيح انتشاراً واسعاً',
+  'الفكرة قابلة للتوسع والنمو بشكل طبيعي',
+  'الجمهور المستهدف يمتلك القدرة الشرائية اللازمة',
+  'ميزة التخصيص الثقافي تمنح ميزة تنافسية واضحة',
+];
+
+const WEAKNESSES_POOL = [
+  'السوق به منافسة قوية من شركات عالمية راسخة',
+  'الوعي بالمنتج منخفض ويتطلب استثماراً كبيراً في التسويق',
+  'بعض الشرائح تتردد بسبب قلة الثقة في منتجات جديدة',
+  'تكلفة الاستحواذ على العملاء قد تكون مرتفعة',
+  'الخدمة اللوجستية في بعض المدن قد تشكل تحدياً',
+  'الموسمية قد تؤثر على الطلب في فترات معينة',
+  'الحاجة لشهادات أو اعتمادات تزيد من وقت الدخول للسوق',
+];
+
+const RECOS_POOL = [
+  { title: 'البدء بالرياض وجدة', desc: 'ركّز على المدن الكبرى أولاً لبناء قاعدة عملاء قوية قبل التوسع' },
+  { title: 'حملة تجريبية مجانية', desc: 'قدّم عروضاً تجريبية مجانية للأشهر الثلاثة الأولى لبناء الثقة' },
+  { title: 'شراكات مع المؤثرين', desc: 'تعاون مع مؤثرين عرب في مجال تخصصك لتوسيع الوعي بالعلامة' },
+  { title: 'برنامج الإحالة', desc: 'أطلق برنامج إحالة يمنح المستخدمين مكافآت مقابل جلب أصدقائهم' },
+  { title: 'تحسين تجربة الموبايل', desc: 'تأكد من أن تجربة الهاتف المحمول ممتازة — 87% من المستخدمين العرب يتسوقون بالهاتف' },
+  { title: 'دعم عملاء 24/7', desc: 'قدّم دعماً فورياً باللغة العربية لبناء الثقة وتقليل معدل الترك' },
+  { title: 'خطة تسعير مرنة', desc: 'قدّم خيارات تسعير متعددة تناسب مختلف الدخول والاحتياجات' },
+  { title: 'تسويق المحتوى', desc: 'أنتج محتوى عربياً مفيداً يجيب على أسئلة جمهورك المستهدف' },
+];
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+}
+
+// ═══════════════════════════════════════════════════════
+// EXAMPLES
+// ═══════════════════════════════════════════════════════
+
+function renderExamples() {
+  const el = document.getElementById('examples-list');
+  el.innerHTML = EXAMPLES.map((ex, i) =>
+    `<span class="ex-chip" onclick="applyExample(${i})">${ex.label}</span>`
+  ).join('');
+}
+
+function applyExample(i) {
+  const ex = EXAMPLES[i];
+  document.getElementById('idea-input').value = ex.idea;
+  if (ex.price) document.getElementById('price-input').value = ex.price;
+  if (ex.income) document.getElementById('income-input').value = ex.income;
+}
+
+// ═══════════════════════════════════════════════════════
+// MODE TOGGLE
+// ═══════════════════════════════════════════════════════
+
+function setMode(mode) {
+  currentMode = mode;
+  const concept = document.getElementById('mode-concept');
+  const existing = document.getElementById('mode-existing');
+  const label = document.getElementById('idea-label');
+  const textarea = document.getElementById('idea-input');
+
+  if (mode === 'concept') {
+    concept.className = 'mode-card active-violet';
+    existing.className = 'mode-card';
+    existing.querySelector('.mode-title').style.color = 'var(--muted)';
+    label.innerHTML = '🧠 فكرة المنتج <span>*</span>';
+    textarea.placeholder = 'صف منتجك أو خدمتك، جمهورك المستهدف، والقيمة التي تقدمها...';
+  } else {
+    existing.className = 'mode-card active-cyan';
+    concept.className = 'mode-card';
+    concept.querySelector('.mode-title').style.color = 'var(--muted)';
+    label.innerHTML = '🧪 وصف المنتج/الخدمة الموجودة <span>*</span>';
+    textarea.placeholder = 'صف المنتج أو الخدمة الموجودة — اذكر ما الذي يميزه، منذ متى هو في السوق، وما هي ردود فعل العملاء...';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ADVANCED TOGGLE
+// ═══════════════════════════════════════════════════════
+
+let advOpen = false;
+function toggleAdv() {
+  advOpen = !advOpen;
+  document.getElementById('adv-section').className = 'adv-section' + (advOpen ? ' open' : '');
+  document.getElementById('adv-arrow').textContent = advOpen ? '▲' : '▼';
+}
+
+// ═══════════════════════════════════════════════════════
+// SIMULATION ENGINE
+// ═══════════════════════════════════════════════════════
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function generatePersonas(count) {
+  const personas = [];
+  const pool = shuffle(PERSONA_TEMPLATES);
+  for (let i = 0; i < count; i++) {
+    const base = pool[i % pool.length];
+    const decision = pick(DECISIONS);
+    const rating = decision === 'buy' ? rand(4,5) : decision === 'wait' ? rand(3,4) : rand(1,3);
+    personas.push({
+      ...base,
+      id: i,
+      decision,
+      rating,
+      quote: generateQuote(decision, currentMode),
+    });
+  }
+  return personas;
+}
+
+function generateQuote(decision, mode) {
+  const quotes = {
+    buy: mode === 'concept' ? [
+      'فكرة ممتازة! أتمنى لو كانت متاحة الآن، سأكون من أوائل المشترين.',
+      'هذا بالضبط ما كنت أبحث عنه. السعر معقول جداً لما يقدمه.',
+      'مشروع واعد جداً. يحل مشكلة حقيقية نعاني منها.',
+    ] : [
+      'جربته وأنا راضٍ جداً. يستحق كل ريال دفعته.',
+      'من أفضل ما جربته في هذا المجال. سأستمر في استخدامه.',
+      'تجربة ممتازة، خدمة العملاء متميزة وسهولة الاستخدام عالية.',
+    ],
+    wait: [
+      'الفكرة جيدة لكنني بحاجة لرؤية المزيد من التقييمات أولاً.',
+      'سأنتظر صدور الإصدار الأول وأرى آراء المستخدمين الأوائل.',
+      'مثير للاهتمام، لكنني لست متأكداً من القيمة مقابل السعر بعد.',
+    ],
+    skip: [
+      'لا أرى فيه ما يميزه عن البدائل الموجودة حالياً.',
+      'السعر مرتفع نسبياً لما يقدمه من خدمات.',
+      'لا يتناسب مع احتياجاتي الحالية للأسف.',
+    ],
+  };
+  return pick(quotes[decision]);
+}
+
+function calcMetrics(personas) {
+  const buy = personas.filter(p => p.decision === 'buy').length;
+  const wait = personas.filter(p => p.decision === 'wait').length;
+  const skip = personas.filter(p => p.decision === 'skip').length;
+  const avgRating = (personas.reduce((s,p) => s + p.rating, 0) / personas.length).toFixed(1);
+  const acceptRate = Math.round((buy / personas.length) * 100);
+  return { buy, wait, skip, avgRating, acceptRate, total: personas.length };
+}
+
+function getVerdict(acceptRate) {
+  if (acceptRate >= 55) return { label: '✅ اطلق المنتج', cls: 'verdict-go' };
+  if (acceptRate >= 35) return { label: '⚠️ يحتاج تحسين', cls: 'verdict-caution' };
+  return { label: '❌ أعد الدراسة', cls: 'verdict-no' };
+}
+
+// ═══════════════════════════════════════════════════════
+// RUN SIMULATION
+// ═══════════════════════════════════════════════════════
+
+function runSimulation() {
+  const idea = document.getElementById('idea-input').value.trim();
+  if (!idea) {
+    document.getElementById('idea-input').focus();
+    document.getElementById('idea-input').style.borderColor = 'rgba(239,68,68,0.5)';
+    setTimeout(() => document.getElementById('idea-input').style.borderColor = '', 2000);
+    return;
+  }
+
+  const numPersonas = parseInt(document.getElementById('personas-slider').value);
+  const price = document.getElementById('price-input').value.trim();
+  const income = document.getElementById('income-input').value.trim();
+
+  // Show results page with loading
+  showPage('results');
+  document.getElementById('loading-state').style.display = 'block';
+  document.getElementById('report-state').style.display = 'none';
+
+  // Animate loading
+  const steps = [
+    'تحليل الفكرة وفهم السياق...',
+    'بناء الشخصيات الاصطناعية...',
+    'محاكاة ردود الفعل والقرارات...',
+    'حساب مؤشرات السوق...',
+    'إنشاء التقرير الاستراتيجي...',
+  ];
+  let step = 0;
+  let progress = 0;
+  const stepEl = document.getElementById('loading-step');
+  const progEl = document.getElementById('loading-progress');
+
+  const interval = setInterval(() => {
+    progress += rand(12, 22);
+    if (progress > 95) progress = 95;
+    progEl.style.width = progress + '%';
+    stepEl.textContent = steps[Math.min(step, steps.length - 1)];
+    step++;
+  }, 600);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    progEl.style.width = '100%';
+
+    const personas = generatePersonas(numPersonas);
+    const metrics = calcMetrics(personas);
+
+    setTimeout(() => {
+      renderReport({ idea, price, income, personas, metrics, mode: currentMode });
+      addToHistory({ idea, metrics, mode: currentMode });
+    }, 400);
+  }, 3200);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER REPORT
+// ═══════════════════════════════════════════════════════
+
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
+
+function renderReport({ idea, price, income, personas, metrics, mode }) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('report-state').style.display = 'block';
+
+  const verdict = getVerdict(metrics.acceptRate);
+
+  // Badge
+  const badge = document.getElementById('verdict-badge');
+  badge.className = 'verdict-badge ' + verdict.cls;
+  badge.textContent = verdict.label;
+
+  // Title
+  document.getElementById('report-title').textContent = idea.substring(0, 60) + (idea.length > 60 ? '...' : '');
+  document.getElementById('report-subtitle').textContent =
+    `${metrics.total} شخصية اصطناعية · وضع: ${mode === 'concept' ? 'فكرة جديدة 💡' : 'منتج موجود 🧪'}` +
+    (price ? ` · السعر: ${price}` : '') + (income ? ` · الدخل: ${income}` : '');
+
+  // Metrics
+  document.getElementById('metrics-grid').innerHTML = `
+    <div class="glass metric-card">
+      <div class="metric-val" style="color:#10b981">${metrics.acceptRate}%</div>
+      <div class="metric-label">نسبة القبول</div>
+      <div class="metric-sub">${metrics.buy} من ${metrics.total} سيشترون</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="metric-val" style="color:#f59e0b">${metrics.avgRating}</div>
+      <div class="metric-label">متوسط التقييم</div>
+      <div class="metric-sub">من 5 نجوم</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="metric-val" style="color:var(--cyan)">${metrics.wait}</div>
+      <div class="metric-label">قد يشترون</div>
+      <div class="metric-sub">يحتاجون تحفيزاً</div>
+    </div>
+    <div class="glass metric-card">
+      <div class="metric-val" style="color:#ef4444">${metrics.skip}</div>
+      <div class="metric-label">لن يشتروا</div>
+      <div class="metric-sub">رفضوا الفكرة</div>
+    </div>
+  `;
+
+  // Destroy old charts
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+
+  // Chart colors
+  const chartDefaults = { color: 'rgba(255,255,255,0.7)', font: { family: 'Tajawal' } };
+
+  // Decisions chart
+  charts.decisions = new Chart(document.getElementById('chart-decisions'), {
+    type: 'doughnut',
+    data: {
+      labels: ['سيشتري', 'سيفكر', 'لن يشتري'],
+      datasets: [{ data: [metrics.buy, metrics.wait, metrics.skip],
+        backgroundColor: ['rgba(16,185,129,0.8)', 'rgba(245,158,11,0.8)', 'rgba(239,68,68,0.7)'],
+        borderColor: ['#10b981','#f59e0b','#ef4444'], borderWidth: 2,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { family: 'Tajawal', size: 12 } } } }
+    }
+  });
+
+  // Ratings chart
+  const ratingDist = [1,2,3,4,5].map(r => personas.filter(p => p.rating === r).length);
+  charts.ratings = new Chart(document.getElementById('chart-ratings'), {
+    type: 'bar',
+    data: {
+      labels: ['1 ★','2 ★','3 ★','4 ★','5 ★'],
+      datasets: [{ label: 'عدد الشخصيات', data: ratingDist,
+        backgroundColor: ['rgba(239,68,68,0.7)','rgba(245,158,11,0.5)','rgba(245,158,11,0.7)',
+          'rgba(16,185,129,0.6)','rgba(16,185,129,0.85)'],
+        borderRadius: 6,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { family: 'Tajawal' } },
+          grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { display: false } } }
+    }
+  });
+
+  // Demographics chart
+  charts.demographics = new Chart(document.getElementById('chart-demographics'), {
+    type: 'pie',
+    data: {
+      labels: ['18-25', '26-35', '36-45', '46+'],
+      datasets: [{ data: [rand(15,30), rand(30,40), rand(20,30), rand(10,20)],
+        backgroundColor: ['rgba(139,92,246,0.8)','rgba(6,182,212,0.8)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)'],
+        borderWidth: 2,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { family: 'Tajawal', size: 11 } } } }
+    }
+  });
+
+  // Price acceptance
+  charts.price = new Chart(document.getElementById('chart-price'), {
+    type: 'bar',
+    data: {
+      labels: ['رخيص جداً', 'مناسب', 'مرتفع قليلاً', 'مرتفع جداً'],
+      datasets: [{ label: '%', data: [rand(5,15), rand(40,65), rand(15,30), rand(5,15)],
+        backgroundColor: 'rgba(139,92,246,0.6)', borderRadius: 6,
+        borderColor: 'rgba(139,92,246,0.9)', borderWidth: 1,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { family: 'Tajawal' } },
+          grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { ticks: { color: 'rgba(255,255,255,0.6)', font: { family: 'Tajawal' } }, grid: { display: false } } }
+    }
+  });
+
+  // Personas
+  const displayPersonas = personas.slice(0, 9);
+  document.getElementById('personas-grid').innerHTML = displayPersonas.map(p => `
+    <div class="glass persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar" style="background:rgba(139,92,246,0.15)">${p.emoji}</div>
+        <div class="persona-info">
+          <h4>${p.name}</h4>
+          <p>${p.job} · ${p.city} · ${p.age} سنة</p>
+        </div>
+      </div>
+      <div class="persona-decision ${DECISION_CLASSES[p.decision]}">${DECISION_LABELS[p.decision]}</div>
+      <div class="persona-stars">${stars(p.rating)}</div>
+      <div class="persona-quote">"${p.quote}"</div>
+    </div>
+  `).join('');
+
+  // Strengths & Weaknesses
+  const strengths = shuffle(STRENGTHS_POOL).slice(0, rand(3,4));
+  const weaknesses = shuffle(WEAKNESSES_POOL).slice(0, rand(2,3));
+
+  document.getElementById('strengths-list').innerHTML = strengths.map(s =>
+    `<div class="insight-item"><div class="insight-dot dot-green"></div><span>${s}</span></div>`
+  ).join('');
+
+  document.getElementById('weaknesses-list').innerHTML = weaknesses.map(w =>
+    `<div class="insight-item"><div class="insight-dot dot-red"></div><span>${w}</span></div>`
+  ).join('');
+
+  // Recommendations
+  const recos = shuffle(RECOS_POOL).slice(0, 4);
+  document.getElementById('reco-grid').innerHTML = recos.map(r =>
+    `<div class="reco-item"><h4>${r.title}</h4><p>${r.desc}</p></div>`
+  ).join('');
+
+  // Executive Summary
+  const summaryOpts = [
+    `بناءً على محاكاة ${metrics.total} شخصية من السوق العربي، حصلت فكرتك على نسبة قبول ${metrics.acceptRate}% بمتوسط تقييم ${metrics.avgRating}/5. ${metrics.buy} شخصية مستعدة للشراء فوراً، بينما ${metrics.wait} شخصية تحتاج مزيداً من الإقناع. ${verdict.label.replace(/[✅⚠️❌]/g,'').trim()}.`,
+    `المحاكاة كشفت أن المنتج يلقى قبولاً ${metrics.acceptRate >= 50 ? 'إيجابياً' : 'محدوداً'} في السوق العربي. أبرز الفئات المهتمة هم الفئة العمرية 25-40 سنة من الدخل المتوسط. التركيز على تحسين نقاط الضعف المذكورة سيرفع نسبة القبول بشكل ملحوظ.`,
+  ];
+  document.getElementById('exec-summary').textContent = pick(summaryOpts);
+}
+
+// ═══════════════════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════════════════
+
+function addToHistory(entry) {
+  history.unshift({ ...entry, date: new Date().toLocaleString('ar-SA') });
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (history.length === 0) return;
+
+  el.innerHTML = history.map((h, i) => {
+    const verdict = getVerdict(h.metrics.acceptRate);
+    return `
+      <div class="glass history-item" onclick="showHistoryResult(${i})">
+        <div>
+          <div class="history-idea">${h.idea.substring(0, 70)}${h.idea.length > 70 ? '...' : ''}</div>
+          <div class="history-meta">
+            ${h.date} · ${h.metrics.total} شخصية · وضع: ${h.mode === 'concept' ? 'فكرة جديدة 💡' : 'منتج موجود 🧪'}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+          <span class="history-badge ${verdict.cls}">${verdict.label}</span>
+          <div style="font-size:18px;font-weight:900;color:${h.metrics.acceptRate>=55?'#10b981':h.metrics.acceptRate>=35?'#f59e0b':'#ef4444'}">${h.metrics.acceptRate}%</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function showHistoryResult(i) {
+  // Re-show results page — for demo we just navigate
+  showPage('results');
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('report-state').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+
+renderExamples();
+</script>
+</body>
+</html>

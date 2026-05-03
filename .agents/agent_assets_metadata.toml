@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "hRdvj-4cVYd_gjOVkEZRE"
+uri = "file://marketsim-standalone.zip"
+type = "unspecified"
+title = "MarketSim AI — ملف HTML كامل"
