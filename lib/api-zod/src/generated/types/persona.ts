@@ -19,4 +19,5 @@ export interface Persona {
   decision: PersonaDecision;
   dealBreaker: string;
   orderIndex: number;
+  rating?: number | null;
 }

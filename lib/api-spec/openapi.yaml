@@ -18,7 +18,6 @@ paths:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -152,6 +151,20 @@ components:
           type: string
         ideaText:
           type: string
+        income:
+          type: string
+          nullable: true
+        price:
+          type: string
+          nullable: true
+        image1Url:
+          type: string
+          nullable: true
+        image2Url:
+          type: string
+          nullable: true
+        numPersonas:
+          type: integer
         status:
           type: string
           enum: [pending, running, completed, failed]
@@ -168,6 +181,7 @@ components:
         - id
         - title
         - ideaText
+        - numPersonas
         - status
         - createdAt
         - updatedAt
@@ -177,6 +191,18 @@ components:
       properties:
         ideaText:
           type: string
+        income:
+          type: string
+        price:
+          type: string
+        image1Url:
+          type: string
+        image2Url:
+          type: string
+        numPersonas:
+          type: integer
+          minimum: 3
+          maximum: 12
       required:
         - ideaText
 
@@ -206,6 +232,9 @@ components:
           type: string
         orderIndex:
           type: integer
+        rating:
+          type: integer
+          nullable: true
       required:
         - id
         - simulationId
@@ -269,6 +298,20 @@ components:
           type: string
         ideaText:
           type: string
+        income:
+          type: string
+          nullable: true
+        price:
+          type: string
+          nullable: true
+        image1Url:
+          type: string
+          nullable: true
+        image2Url:
+          type: string
+          nullable: true
+        numPersonas:
+          type: integer
         status:
           type: string
           enum: [pending, running, completed, failed]
@@ -292,6 +335,7 @@ components:
         - id
         - title
         - ideaText
+        - numPersonas
         - status
         - createdAt
         - updatedAt

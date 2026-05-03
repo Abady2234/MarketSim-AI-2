@@ -23,6 +23,11 @@ export interface Simulation {
   id: number;
   title: string;
   ideaText: string;
+  income?: string | null;
+  price?: string | null;
+  image1Url?: string | null;
+  image2Url?: string | null;
+  numPersonas: number;
   status: SimulationStatus;
   acceptanceRate?: number | null;
   createdAt: string;
@@ -31,6 +36,15 @@ export interface Simulation {
 
 export interface CreateSimulationBody {
   ideaText: string;
+  income?: string;
+  price?: string;
+  image1Url?: string;
+  image2Url?: string;
+  /**
+   * @minimum 3
+   * @maximum 12
+   */
+  numPersonas?: number;
 }
 
 export type PersonaDecision =
@@ -54,6 +68,7 @@ export interface Persona {
   decision: PersonaDecision;
   dealBreaker: string;
   orderIndex: number;
+  rating?: number | null;
 }
 
 export interface SimulationReport {
@@ -85,6 +100,11 @@ export interface SimulationWithReport {
   id: number;
   title: string;
   ideaText: string;
+  income?: string | null;
+  price?: string | null;
+  image1Url?: string | null;
+  image2Url?: string | null;
+  numPersonas: number;
   status: SimulationWithReportStatus;
   acceptanceRate?: number | null;
   createdAt: string;

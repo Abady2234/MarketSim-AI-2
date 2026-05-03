@@ -11,6 +11,11 @@ export interface Simulation {
   id: number;
   title: string;
   ideaText: string;
+  income?: string | null;
+  price?: string | null;
+  image1Url?: string | null;
+  image2Url?: string | null;
+  numPersonas: number;
   status: SimulationStatus;
   acceptanceRate?: number | null;
   createdAt: Date;

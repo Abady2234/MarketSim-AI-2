@@ -112,6 +112,11 @@ router.post("/simulations", async (req, res) => {
       .values({
         title: "محاكاة جديدة",
         ideaText: body.data.ideaText,
+        income: body.data.income ?? null,
+        price: body.data.price ?? null,
+        image1Url: body.data.image1Url ?? null,
+        image2Url: body.data.image2Url ?? null,
+        numPersonas: body.data.numPersonas ?? 7,
         status: "pending",
       })
       .returning();

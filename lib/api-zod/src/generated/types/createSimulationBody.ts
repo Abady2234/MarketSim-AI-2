@@ -8,4 +8,13 @@
 
 export interface CreateSimulationBody {
   ideaText: string;
+  income?: string;
+  price?: string;
+  image1Url?: string;
+  image2Url?: string;
+  /**
+   * @minimum 3
+   * @maximum 12
+   */
+  numPersonas?: number;
 }

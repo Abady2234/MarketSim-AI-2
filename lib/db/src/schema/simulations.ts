@@ -6,6 +6,11 @@ export const simulationsTable = pgTable("simulations", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   ideaText: text("idea_text").notNull(),
+  income: text("income"),
+  price: text("price"),
+  image1Url: text("image1_url"),
+  image2Url: text("image2_url"),
+  numPersonas: integer("num_personas").notNull().default(7),
   status: text("status").notNull().default("pending"),
   acceptanceRate: real("acceptance_rate"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -24,6 +29,7 @@ export const personasTable = pgTable("personas", {
   decision: text("decision").notNull(),
   dealBreaker: text("deal_breaker").notNull(),
   orderIndex: integer("order_index").notNull().default(0),
+  rating: integer("rating"),
 });
 
 export const simulationReportsTable = pgTable("simulation_reports", {

@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -22,6 +21,11 @@ export const ListSimulationsResponseItem = zod.object({
   id: zod.number(),
   title: zod.string(),
   ideaText: zod.string(),
+  income: zod.string().nullish(),
+  price: zod.string().nullish(),
+  image1Url: zod.string().nullish(),
+  image2Url: zod.string().nullish(),
+  numPersonas: zod.number(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),
@@ -32,8 +36,20 @@ export const ListSimulationsResponse = zod.array(ListSimulationsResponseItem);
 /**
  * @summary Create a new simulation
  */
+export const createSimulationBodyNumPersonasMin = 3;
+export const createSimulationBodyNumPersonasMax = 12;
+
 export const CreateSimulationBody = zod.object({
   ideaText: zod.string(),
+  income: zod.string().optional(),
+  price: zod.string().optional(),
+  image1Url: zod.string().optional(),
+  image2Url: zod.string().optional(),
+  numPersonas: zod
+    .number()
+    .min(createSimulationBodyNumPersonasMin)
+    .max(createSimulationBodyNumPersonasMax)
+    .optional(),
 });
 
 /**
@@ -48,6 +64,11 @@ export const GetSimulationStatsResponse = zod.object({
       id: zod.number(),
       title: zod.string(),
       ideaText: zod.string(),
+      income: zod.string().nullish(),
+      price: zod.string().nullish(),
+      image1Url: zod.string().nullish(),
+      image2Url: zod.string().nullish(),
+      numPersonas: zod.number(),
       status: zod.enum(["pending", "running", "completed", "failed"]),
       acceptanceRate: zod.number().nullish(),
       createdAt: zod.coerce.date(),
@@ -67,6 +88,11 @@ export const GetSimulationResponse = zod.object({
   id: zod.number(),
   title: zod.string(),
   ideaText: zod.string(),
+  income: zod.string().nullish(),
+  price: zod.string().nullish(),
+  image1Url: zod.string().nullish(),
+  image2Url: zod.string().nullish(),
+  numPersonas: zod.number(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),
@@ -84,6 +110,7 @@ export const GetSimulationResponse = zod.object({
       decision: zod.enum(["confirmed_buy", "hesitant_buy", "flat_reject"]),
       dealBreaker: zod.string(),
       orderIndex: zod.number(),
+      rating: zod.number().nullish(),
     }),
   ),
   report: zod
