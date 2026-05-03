@@ -5,6 +5,7 @@
  * MarketSim AI API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { SimulationSimulationMode } from "./simulationSimulationMode";
 import type { SimulationStatus } from "./simulationStatus";
 
 export interface Simulation {
@@ -21,6 +22,7 @@ export interface Simulation {
   problemSolved?: string | null;
   competitors?: string | null;
   extraDetails?: string | null;
+  simulationMode?: SimulationSimulationMode;
   status: SimulationStatus;
   acceptanceRate?: number | null;
   createdAt: Date;

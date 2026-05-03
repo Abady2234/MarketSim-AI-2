@@ -241,15 +241,27 @@ async function generatePersona(
   image1Url?: string | null,
   image2Url?: string | null,
   targetAge?: string | null,
-  targetCity?: string | null
+  targetCity?: string | null,
+  simulationMode?: string | null
 ): Promise<GeneratedPersona> {
   const archetype = GOOGLE_MAPS_ARCHETYPES[archetypeIndex % GOOGLE_MAPS_ARCHETYPES.length]!;
+  const isExisting = simulationMode === "existing";
 
   const userContent: Array<
     { type: "text"; text: string } | { type: "image_url"; image_url: { url: string } }
   > = [];
 
+  const modeContext = isExisting
+    ? `هذا المنتج/الخدمة موجود بالفعل في السوق وأنت جربته فعلياً. ردّك يجب أن يكون كمن استخدم المنتج وعاش التجربة الحقيقية — وليس مجرد تقييم فكرة.`
+    : `هذا المنتج/الخدمة لم يُطلق بعد. أنت تسمع عنه لأول مرة وتكوّن رأيك الأولي بناءً على الوصف فقط.`;
+
+  const opinionInstruction = isExisting
+    ? `"opinion": "رأيها الصريح بضمير المتكلم (أنا) بعد تجربة المنتج فعلاً. اذكر شيئاً محدداً جربته أو لاحظته. 3-5 جمل واقعية جداً كمن استخدم الخدمة حقاً"`
+    : `"opinion": "رأيها الصريح جداً بضمير المتكلم (أنا) عند سماعها عن هذا المنتج لأول مرة. 3-5 جمل. يجب أن يكون الرأي حقيقياً ومبنياً على نمط الشخصية"`;
+
   let promptText = `أنت شخصية رقم ${personaIndex + 1} تمثل نمط هذا المراجع: "${archetype.hint}"
+
+السياق المهم: ${modeContext}
 
 تفاصيل المنتج/الخدمة:
 - الاسم: ${parsedIdea.productName}
@@ -275,9 +287,9 @@ async function generatePersona(
   "profession": "المهنة التي تناسب هذه الشخصية",
   "lifestyle": "نمط حياتها في جملة واحدة واقعية ومحددة",
   "digitalBehavior": "كيف تتصرف على الإنترنت تحديداً، وصف حي ومحدد",
-  "opinion": "رأيها الصريح جداً بضمير المتكلم (أنا) عند سماعها عن هذا المنتج لأول مرة. 3-5 جمل. يجب أن يكون الرأي حقيقياً ومبنياً على نمط الشخصية",
+  ${opinionInstruction},
   "decision": "${archetype.decisionBias === "confirmed_buy" ? "confirmed_buy" : archetype.decisionBias === "hesitant_buy" ? "hesitant_buy" : "flat_reject"}",
-  "dealBreaker": "العامل الحاسم في قرارها في جملة واحدة",
+  "dealBreaker": "${isExisting ? "العامل الذي جعلها تتردد أو تنصرف بعد التجربة الفعلية، في جملة واحدة" : "العامل الحاسم في قرارها في جملة واحدة"}",
   "rating": عدد من ${archetype.ratingBias[0]} إلى ${archetype.ratingBias[1]}
 }
 
@@ -440,7 +452,8 @@ async function processBatch(
       simulation.image1Url,
       simulation.image2Url,
       simulation.targetAge,
-      simulation.targetCity
+      simulation.targetCity,
+      simulation.simulationMode
     )
   );
 

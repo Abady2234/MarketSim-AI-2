@@ -122,6 +122,7 @@ router.post("/simulations", async (req, res) => {
         problemSolved: body.data.problemSolved ?? null,
         competitors: body.data.competitors ?? null,
         extraDetails: body.data.extraDetails ?? null,
+        simulationMode: body.data.simulationMode ?? "concept",
         status: "pending",
       })
       .returning();

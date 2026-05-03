@@ -133,7 +133,20 @@ export default function SimulationDetail() {
 
       {/* ─── Idea Input ─── */}
       <div className="glass-card p-6 mb-6">
-        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3">فكرة المنتج</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">
+            {simulation.simulationMode === "existing" ? "وصف المنتج/الخدمة" : "فكرة المنتج"}
+          </p>
+          {simulation.simulationMode && (
+            <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg border uppercase tracking-widest ${
+              simulation.simulationMode === "existing"
+                ? "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"
+                : "border-violet-500/30 bg-violet-500/10 text-violet-400"
+            }`}>
+              {simulation.simulationMode === "existing" ? "🧪 منتج موجود" : "💡 فكرة جديدة"}
+            </span>
+          )}
+        </div>
         <p className="text-white/80 text-sm leading-relaxed font-mono bg-black/20 p-4 rounded-xl border border-white/[0.06]" dir="auto">
           {simulation.ideaText}
         </p>

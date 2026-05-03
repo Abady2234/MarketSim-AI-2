@@ -31,6 +31,7 @@ export const ListSimulationsResponseItem = zod.object({
   problemSolved: zod.string().nullish(),
   competitors: zod.string().nullish(),
   extraDetails: zod.string().nullish(),
+  simulationMode: zod.enum(["concept", "existing"]).optional(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),
@@ -60,6 +61,7 @@ export const CreateSimulationBody = zod.object({
   problemSolved: zod.string().optional(),
   competitors: zod.string().optional(),
   extraDetails: zod.string().optional(),
+  simulationMode: zod.enum(["concept", "existing"]).optional(),
 });
 
 /**
@@ -84,6 +86,7 @@ export const GetSimulationStatsResponse = zod.object({
       problemSolved: zod.string().nullish(),
       competitors: zod.string().nullish(),
       extraDetails: zod.string().nullish(),
+      simulationMode: zod.enum(["concept", "existing"]).optional(),
       status: zod.enum(["pending", "running", "completed", "failed"]),
       acceptanceRate: zod.number().nullish(),
       createdAt: zod.coerce.date(),
@@ -113,6 +116,7 @@ export const GetSimulationResponse = zod.object({
   problemSolved: zod.string().nullish(),
   competitors: zod.string().nullish(),
   extraDetails: zod.string().nullish(),
+  simulationMode: zod.enum(["concept", "existing"]).optional(),
   status: zod.enum(["pending", "running", "completed", "failed"]),
   acceptanceRate: zod.number().nullish(),
   createdAt: zod.coerce.date(),

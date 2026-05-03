@@ -5,6 +5,7 @@
  * MarketSim AI API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { CreateSimulationBodySimulationMode } from "./createSimulationBodySimulationMode";
 
 export interface CreateSimulationBody {
   ideaText: string;
@@ -22,4 +23,5 @@ export interface CreateSimulationBody {
   problemSolved?: string;
   competitors?: string;
   extraDetails?: string;
+  simulationMode?: CreateSimulationBodySimulationMode;
 }

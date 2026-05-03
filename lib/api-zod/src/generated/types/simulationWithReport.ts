@@ -7,6 +7,7 @@
  */
 import type { Persona } from "./persona";
 import type { SimulationReport } from "./simulationReport";
+import type { SimulationWithReportSimulationMode } from "./simulationWithReportSimulationMode";
 import type { SimulationWithReportStatus } from "./simulationWithReportStatus";
 
 export interface SimulationWithReport {
@@ -23,6 +24,7 @@ export interface SimulationWithReport {
   problemSolved?: string | null;
   competitors?: string | null;
   extraDetails?: string | null;
+  simulationMode?: SimulationWithReportSimulationMode;
   status: SimulationWithReportStatus;
   acceptanceRate?: number | null;
   createdAt: Date;

@@ -180,6 +180,9 @@ components:
         extraDetails:
           type: string
           nullable: true
+        simulationMode:
+          type: string
+          enum: [concept, existing]
         status:
           type: string
           enum: [pending, running, completed, failed]
@@ -228,6 +231,9 @@ components:
           type: string
         extraDetails:
           type: string
+        simulationMode:
+          type: string
+          enum: [concept, existing]
       required:
         - ideaText
 
@@ -352,6 +358,9 @@ components:
         extraDetails:
           type: string
           nullable: true
+        simulationMode:
+          type: string
+          enum: [concept, existing]
         status:
           type: string
           enum: [pending, running, completed, failed]

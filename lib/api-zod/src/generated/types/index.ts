@@ -8,12 +8,15 @@
 
 export * from "./apiError";
 export * from "./createSimulationBody";
+export * from "./createSimulationBodySimulationMode";
 export * from "./healthStatus";
 export * from "./persona";
 export * from "./personaDecision";
 export * from "./simulation";
 export * from "./simulationReport";
+export * from "./simulationSimulationMode";
 export * from "./simulationStats";
 export * from "./simulationStatus";
 export * from "./simulationWithReport";
+export * from "./simulationWithReportSimulationMode";
 export * from "./simulationWithReportStatus";

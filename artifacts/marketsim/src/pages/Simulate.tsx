@@ -71,6 +71,9 @@ export default function Simulate() {
   const [image2Url, setImage2Url] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
 
+  // Simulation mode
+  const [simulationMode, setSimulationMode] = useState<"concept" | "existing">("concept");
+
   // New detail fields
   const [targetAge, setTargetAge] = useState("");
   const [targetCity, setTargetCity] = useState("");
@@ -83,7 +86,7 @@ export default function Simulate() {
   const fileInput1Ref = useRef<HTMLInputElement>(null);
   const fileInput2Ref = useRef<HTMLInputElement>(null);
 
-  const applyExample = (ex: typeof EXAMPLE_IDEAS[0]) => {
+  const applyExample = (ex: typeof EXAMPLE_IDEAS[0], mode?: "concept" | "existing") => {
     setIdeaText(ex.ideaText);
     if (ex.price) setPrice(ex.price);
     if (ex.targetAge) setTargetAge(ex.targetAge);
@@ -130,6 +133,7 @@ export default function Simulate() {
           problemSolved: problemSolved || undefined,
           competitors: competitors || undefined,
           extraDetails: extraDetails || undefined,
+          simulationMode,
         },
       },
       { onSuccess: (sim) => setLocation(`/simulation/${sim.id}`) }
@@ -192,16 +196,71 @@ export default function Simulate() {
 
               <div className="space-y-7 relative z-10">
 
+                {/* ─── Simulation Mode Toggle ─── */}
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 text-xs font-black text-white/50 uppercase tracking-widest">
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    وضع المحاكاة
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSimulationMode("concept")}
+                      className={`relative p-4 rounded-xl border text-right transition-all duration-200 ${
+                        simulationMode === "concept"
+                          ? "border-violet-500/50 bg-violet-500/15 shadow-[0_0_20px_rgba(139,92,246,0.15)]"
+                          : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"
+                      }`}
+                      data-testid="mode-concept"
+                    >
+                      {simulationMode === "concept" && (
+                        <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_6px_rgba(139,92,246,0.8)]" />
+                      )}
+                      <div className="text-xl mb-1.5">💡</div>
+                      <div className={`font-black text-sm mb-1 ${simulationMode === "concept" ? "text-violet-300" : "text-white/60"}`}>
+                        فكرة جديدة
+                      </div>
+                      <div className="text-[11px] text-white/30 leading-relaxed">
+                        الشخصيات تقيّم المنتج كمفهوم لأول مرة — ردود فعل أولية وانطباعات
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setSimulationMode("existing")}
+                      className={`relative p-4 rounded-xl border text-right transition-all duration-200 ${
+                        simulationMode === "existing"
+                          ? "border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_20px_rgba(6,182,212,0.12)]"
+                          : "border-white/[0.08] bg-white/[0.03] hover:border-white/20"
+                      }`}
+                      data-testid="mode-existing"
+                    >
+                      {simulationMode === "existing" && (
+                        <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(6,182,212,0.8)]" />
+                      )}
+                      <div className="text-xl mb-1.5">🧪</div>
+                      <div className={`font-black text-sm mb-1 ${simulationMode === "existing" ? "text-cyan-300" : "text-white/60"}`}>
+                        منتج موجود
+                      </div>
+                      <div className="text-[11px] text-white/30 leading-relaxed">
+                        الشخصيات جرّبوا المنتج فعلاً — مراجعات تجربة حقيقية ومحددة
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Idea */}
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-sm font-black text-white/80 uppercase tracking-widest">
                     <Brain className="w-4 h-4 text-violet-400" />
-                    فكرة المنتج <span className="text-cyan-400">*</span>
+                    {simulationMode === "existing" ? "وصف المنتج/الخدمة الموجودة" : "فكرة المنتج"} <span className="text-cyan-400">*</span>
                   </label>
                   <textarea
                     value={ideaText}
                     onChange={(e) => setIdeaText(e.target.value)}
-                    placeholder="صف منتجك أو خدمتك، جمهورك المستهدف، والقيمة التي تقدمها..."
+                    placeholder={simulationMode === "existing"
+                      ? "صف المنتج أو الخدمة الموجودة — اذكر ما الذي يميزه، منذ متى هو في السوق، وما هي ردود فعل العملاء..."
+                      : "صف منتجك أو خدمتك، جمهورك المستهدف، والقيمة التي تقدمها..."}
                     className="glass-input w-full min-h-[140px] p-5 text-white text-base leading-loose resize-y"
                     dir="auto"
                     required

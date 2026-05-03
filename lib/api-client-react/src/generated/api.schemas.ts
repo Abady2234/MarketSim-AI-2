@@ -9,6 +9,14 @@ export interface HealthStatus {
   status: string;
 }
 
+export type SimulationSimulationMode =
+  (typeof SimulationSimulationMode)[keyof typeof SimulationSimulationMode];
+
+export const SimulationSimulationMode = {
+  concept: "concept",
+  existing: "existing",
+} as const;
+
 export type SimulationStatus =
   (typeof SimulationStatus)[keyof typeof SimulationStatus];
 
@@ -33,11 +41,20 @@ export interface Simulation {
   problemSolved?: string | null;
   competitors?: string | null;
   extraDetails?: string | null;
+  simulationMode?: SimulationSimulationMode;
   status: SimulationStatus;
   acceptanceRate?: number | null;
   createdAt: string;
   updatedAt: string;
 }
+
+export type CreateSimulationBodySimulationMode =
+  (typeof CreateSimulationBodySimulationMode)[keyof typeof CreateSimulationBodySimulationMode];
+
+export const CreateSimulationBodySimulationMode = {
+  concept: "concept",
+  existing: "existing",
+} as const;
 
 export interface CreateSimulationBody {
   ideaText: string;
@@ -55,6 +72,7 @@ export interface CreateSimulationBody {
   problemSolved?: string;
   competitors?: string;
   extraDetails?: string;
+  simulationMode?: CreateSimulationBodySimulationMode;
 }
 
 export type PersonaDecision =
@@ -96,6 +114,14 @@ export interface SimulationReport {
   recommendation3: string;
 }
 
+export type SimulationWithReportSimulationMode =
+  (typeof SimulationWithReportSimulationMode)[keyof typeof SimulationWithReportSimulationMode];
+
+export const SimulationWithReportSimulationMode = {
+  concept: "concept",
+  existing: "existing",
+} as const;
+
 export type SimulationWithReportStatus =
   (typeof SimulationWithReportStatus)[keyof typeof SimulationWithReportStatus];
 
@@ -120,6 +146,7 @@ export interface SimulationWithReport {
   problemSolved?: string | null;
   competitors?: string | null;
   extraDetails?: string | null;
+  simulationMode?: SimulationWithReportSimulationMode;
   status: SimulationWithReportStatus;
   acceptanceRate?: number | null;
   createdAt: string;

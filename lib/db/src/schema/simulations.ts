@@ -17,6 +17,8 @@ export const simulationsTable = pgTable("simulations", {
   problemSolved: text("problem_solved"),
   competitors: text("competitors"),
   extraDetails: text("extra_details"),
+  // "concept" = evaluate idea for first time | "existing" = already launched, give experience-based review
+  simulationMode: text("simulation_mode").notNull().default("concept"),
   status: text("status").notNull().default("pending"),
   acceptanceRate: real("acceptance_rate"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
