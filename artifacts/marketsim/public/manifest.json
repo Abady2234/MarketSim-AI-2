@@ -1,0 +1,51 @@
+{
+  "name": "MarketSim AI — محاكاة السوق",
+  "short_name": "MarketSim",
+  "description": "اختبر فكرتك التجارية بذكاء اصطناعي عربي قبل الإطلاق",
+  "start_url": "/marketsim/",
+  "scope": "/marketsim/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#06040f",
+  "theme_color": "#8b5cf6",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "/marketsim/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/marketsim/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/marketsim/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "محاكاة جديدة",
+      "short_name": "محاكاة",
+      "description": "ابدأ محاكاة سوق جديدة",
+      "url": "/marketsim/simulate",
+      "icons": [{ "src": "/marketsim/icons/icon-192.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "سجل المحاكاة",
+      "short_name": "السجل",
+      "description": "عرض المحاكاة السابقة",
+      "url": "/marketsim/history",
+      "icons": [{ "src": "/marketsim/icons/icon-192.svg", "sizes": "192x192" }]
+    }
+  ]
+}

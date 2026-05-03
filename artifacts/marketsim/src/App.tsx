@@ -8,6 +8,7 @@ import Simulate from "@/pages/Simulate";
 import SimulationDetail from "@/pages/SimulationDetail";
 import History from "@/pages/History";
 import NotFound from "@/pages/not-found";
+import InstallPrompt from "@/components/InstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ function App() {
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <Router />
         </WouterRouter>
+        <InstallPrompt />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
