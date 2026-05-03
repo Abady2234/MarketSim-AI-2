@@ -473,15 +473,15 @@ async function processBatch(
       .values({
         simulationId,
         name: persona.name,
-        age: persona.age,
-        profession: persona.profession,
-        lifestyle: persona.lifestyle,
-        digitalBehavior: persona.digitalBehavior,
-        opinion: persona.opinion,
+        age: Math.round(persona.age) || 25,
+        profession: persona.profession || "موظف",
+        lifestyle: persona.lifestyle || "",
+        digitalBehavior: persona.digitalBehavior || "",
+        opinion: persona.opinion || "",
         decision: persona.decision,
-        dealBreaker: persona.dealBreaker,
+        dealBreaker: persona.dealBreaker || "",
         orderIndex: i,
-        rating: persona.rating,
+        rating: Math.min(5, Math.max(1, Math.round(persona.rating ?? 3))),
       })
       .returning();
 
